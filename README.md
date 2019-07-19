@@ -30,3 +30,10 @@ Ctrl+Shift+Win+W
 Viewing
 To view the current context:
 Alt+Win+Enter
+
+## Available commands 
+|Key/Commands|Function|
+|:----------:|:-------|
+|Ctrl+Shift+Win+W| Enter Normal Mode. (WORKING context)|
+|Ctrl+Shift+Win+P| Enter Alternative Mode. ("PLAYING" context)|
+|alt+win+Enter| view the current context|
