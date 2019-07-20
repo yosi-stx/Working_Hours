@@ -37,3 +37,7 @@ Alt+Win+Enter
 |Ctrl+Shift+Win+W| Enter Normal Mode. (WORKING context)|
 |Ctrl+Shift+Win+P| Enter Alternative Mode. ("PLAYING" context)|
 |alt+win+Enter| view the current context|
+
+
+## Version
+V_0.1
