@@ -84,6 +84,7 @@ else
 ~WheelDown::
 ~WheelUp::
 was_active++
+Progress,1: OFF  ; remove resting message 
 return
 
 Mouse_Movement_Timer_Func:
@@ -100,6 +101,7 @@ MouseGetPos, Start_PosX2, Start_PosY2
   {
     Delta := 0
     was_active++
+    Progress,1: OFF  ; remove resting message 
     ;ToolTip, Mouse_Movement_Delta%Delta%, 1000, 5
     SetTimer, tooltip_on_Timer, 3000
   }
@@ -183,7 +185,7 @@ was_active_Timer:
   }
   
   if was_active > 0
-  {   
+  {
     ToolTip, was_active=%was_active%, 1150, 5
     was_active := 0
     if( not_work_flag = 0 )
@@ -199,6 +201,15 @@ was_active_Timer:
       FileAppend, %aggregate_active_min%, C:\AHK\Aggregate_working_Hours.txt
       ; change persistant file
       IniWrite, %aggregate_active_min%, C:\AHK\work_hour_params.txt, AGGREGATE_MIN, aggregate_active_min
+      
+      ; Karōshi protection mechanism ("overwork death" in Japanese) 
+      ; limit working hours to 8.5 hours a day!
+      if( aggregate_active_min = 510 ){
+        Progress, B cwGreen w850 c00 zh0 fs36, You worked today 8.5 hours!!! `n STOP WORKING
+        ComObjCreate("SAPI.SpVoice").Speak("beware of overwork death")
+        MsgBox, PAUSE
+        Progress, Off
+      }
       
       if( Mod(aggregate_active_min, 60) = 0 ){
         aggregate_active_hour++ ;
@@ -217,6 +228,13 @@ was_active_Timer:
     }
   }
   else{
+    ; give resting indication...
+    aggregate_resting_min += 5
+    if( Mod(aggregate_resting_min, 60) = 0 ){
+      aggregate_resting_hour++
+      aggregate_resting_min = 0
+    }
+    Progress,1: B cwWhite y10 w800 c00 zh0 fs36, Resting time: %aggregate_resting_hour%:%aggregate_resting_min%
   }
   SetTimer, tooltip_on_Timer, 3000
   a_last_YDay := A_YDay
