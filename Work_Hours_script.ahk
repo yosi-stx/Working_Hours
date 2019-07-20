@@ -1,4 +1,4 @@
-; C:\Yosi\AHK\Work_Hours_script.ahk
+; C:\Yosi\AHK\PublicProjects.git\Working_Hours\Work_Hours_script.ahk
 ; This script automatically save the aggregate working hours according to user activity on his PC
 ; 
 
@@ -25,6 +25,41 @@ Delta := 0
 ; SetTimer, was_active_Timer, 50000  ;;; this line for debug and development of this script
 SetTimer, was_active_Timer, 300000   ;;; this line for REAL MEASURMENT !!!
 SetTimer, Mouse_Movement_Timer_Func, 100
+
+; automatically create a C:\AHK folder
+; is folder exist?
+DirectoryCheckVar = C:\AHK
+IfNotExist, %DirectoryCheckVar%
+{
+    FileCreateDir, C:\AHK
+    if ErrorLevel   ; i.e. it's not blank or zero.
+      MsgBox, Could not create "C:\AHK\"   folder,`n Please create it manualy :)
+    else
+      MsgBox,,, "C:\AHK\" folder was created `n Please dont delete it,5
+}
+else
+{
+    MsgBox,,, "C:\AHK\" Folder Exist,2
+    ; read values from last script execution
+    IfExist, C:\AHK\work_hour_params.txt
+    {
+      IniRead, a_last_YDay, C:\AHK\work_hour_params.txt, SISSION_DAY, a_last_YDay
+      ; is the same day? A_YDay 
+      if (a_last_YDay = A_YDay)
+      {
+        IniRead, aggregate_active_min, C:\AHK\work_hour_params.txt, AGGREGATE_MIN, aggregate_active_min
+        IniRead, aggregate_active_hour, C:\AHK\work_hour_params.txt, AGGREGATE_HOUR, aggregate_active_hour
+        ; todo: can lose up to five minutes of work due to 5 min quantization. (when reloading script)
+        Progress, B cwWhite w800 c00 zh0 fs36, Aggregated time %aggregate_active_hour%:%aggregate_active_min%
+        MsgBox, PAUSE
+        Progress, Off
+        MsgBox,,, Loaded params: `n hours: %aggregate_active_hour%`n minutes: %aggregate_active_min% ,3
+      }
+    }
+}
+
+; load variables from previous session
+
 
 ;---------------------------------------------------------------------------------------------------
 ;MButton - active indication
@@ -123,6 +158,13 @@ return
   Progress, Off
 return
 
+; so I can add (ctrl+shift+win+W) for WORKING context...
+^+#v::
+  Progress, B cwWhite w800 c00 zh0 fs36, Aggregated time %aggregate_active_hour%:%aggregate_active_min%
+  MsgBox, PAUSE
+  Progress, Off
+return
+
 ;---------------------------------------------------------------------------------------------------
 ;---------------------------------------------------------------------------------------------------
 ;---------------------------------------------------------------------------------------------------
@@ -133,7 +175,7 @@ return
 was_active_Timer:
 {
   ; is a new day?
-  if !(last_YDay = A_YDay)
+  if !(a_last_YDay = A_YDay)
   {
       aggregate_active_min := 0
       aggregate_active_hour := 0 ;;??
@@ -155,6 +197,8 @@ was_active_Timer:
       FileAppend, %DateString%, C:\AHK\Aggregate_working_Hours.txt
       FileAppend, " agg min: ", C:\AHK\Aggregate_working_Hours.txt
       FileAppend, %aggregate_active_min%, C:\AHK\Aggregate_working_Hours.txt
+      ; change persistant file
+      IniWrite, %aggregate_active_min%, C:\AHK\work_hour_params.txt, AGGREGATE_MIN, aggregate_active_min
       
       if( Mod(aggregate_active_min, 60) = 0 ){
         aggregate_active_hour++ ;
@@ -162,6 +206,7 @@ was_active_Timer:
         ComObjCreate("SAPI.SpVoice").Speak(string3)
         FileAppend, " Aggregate Hours: ", C:\AHK\Aggregate_working_Hours.txt
         FileAppend, %aggregate_active_hour%, C:\AHK\Aggregate_working_Hours.txt
+        IniWrite, %aggregate_active_hour%, C:\AHK\work_hour_params.txt, AGGREGATE_HOUR, aggregate_active_hour
         ;MsgBox ,,, %aggregate_active_hour% Hours of work aggragated at ... Time: %A_Hour%:%A_Min%:%A_Sec%.,1
       }
       FileAppend, `n, C:\AHK\Aggregate_working_Hours.txt
@@ -174,7 +219,11 @@ was_active_Timer:
   else{
   }
   SetTimer, tooltip_on_Timer, 3000
-  last_YDay := A_YDay
+  a_last_YDay := A_YDay
+  ; save the day
+  IniWrite, %a_last_YDay%, C:\AHK\work_hour_params.txt, SISSION_DAY, a_last_YDay
+
+  
 }
 return
 
