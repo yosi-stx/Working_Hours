@@ -5,6 +5,7 @@
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
+#SingleInstance force
 
 #Persistent
 SetTitleMatchMode, 2
@@ -12,12 +13,14 @@ SoundBeep 500,60
 MsgBox ,,, Work_Hours_script Wass reloaded ... Time: %A_Hour%:%A_Min%:%A_Sec%.,1
 
 ;
-; Set variable initial velues
+; Set variable initial (default) velues
 full_screen := 0
 was_active := 0
 aggregate_active_min := 0
 aggregate_active_hour := 0
 Delta := 0
+not_work_flag := 0   ; by default, when opening or reloading the script it is in: WORKING session!
+
 
 
 ;SetTimer, was_active_Timer, 5000
@@ -201,6 +204,10 @@ was_active_Timer:
       FileAppend, %aggregate_active_min%, C:\AHK\Aggregate_working_Hours.txt
       ; change persistant file
       IniWrite, %aggregate_active_min%, C:\AHK\work_hour_params.txt, AGGREGATE_MIN, aggregate_active_min
+      if( aggregate_active_hour = 0 ){
+        ; 2019_07_21 bug fixed: param file exist without AGGREGATE_HOUR Section
+        IniWrite, %aggregate_active_hour%, C:\AHK\work_hour_params.txt, AGGREGATE_HOUR, aggregate_active_hour
+      }
       
       ; Karōshi protection mechanism ("overwork death" in Japanese) 
       ; limit working hours to 8.5 hours a day!

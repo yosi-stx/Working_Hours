@@ -38,6 +38,8 @@ Alt+Win+Enter
 |Ctrl+Shift+Win+P| Enter Alternative Mode. ("PLAYING" context)|
 |alt+win+Enter| view the current context|
 
+# default condition
+by default, when opening or reloading the script it is in: WORKING session!
 
 ## Version
-V_0.1
+V_0.2
