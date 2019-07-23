@@ -53,10 +53,12 @@ else
         IniRead, aggregate_active_min, C:\AHK\work_hour_params.txt, AGGREGATE_MIN, aggregate_active_min
         IniRead, aggregate_active_hour, C:\AHK\work_hour_params.txt, AGGREGATE_HOUR, aggregate_active_hour
         ; todo: can lose up to five minutes of work due to 5 min quantization. (when reloading script)
-        Progress, B cwWhite w800 c00 zh0 fs36, Aggregated time %aggregate_active_hour%:%aggregate_active_min%
-        MsgBox, PAUSE
-        Progress, Off
-        MsgBox,,, Loaded params: `n hours: %aggregate_active_hour%`n minutes: %aggregate_active_min% ,3
+        active_min_mod60 := Mod(aggregate_active_min, 60)
+        Progress,7: B cwWhite w800 c00 zh0 fs36, Aggregated time %aggregate_active_hour%:%active_min_mod60%
+        ;MsgBox, PAUSE
+        sleep, 2000
+        Progress,7: Off
+        ;MsgBox,,, Loaded params: `n hours: %aggregate_active_hour%`n minutes: %aggregate_active_min% ,3
       }
     }
 }
