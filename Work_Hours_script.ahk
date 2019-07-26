@@ -20,8 +20,10 @@ aggregate_active_min := 0
 aggregate_active_hour := 0
 Delta := 0
 not_work_flag := 0   ; by default, when opening or reloading the script it is in: WORKING session!
-
-
+aggregate_resting_min := 0
+session_resting_min := 0
+DEBUG := 1
+Version := 0.2
 
 ;SetTimer, was_active_Timer, 5000
 ; 60000 (= 1 minute) ;   60000*5 = 300000 (5 minutes)  ; 50000 ( 10min <==> 1hour) 
@@ -101,7 +103,6 @@ MouseGetPos, Start_PosX2, Start_PosY2
   }
   Start_PosX1 := Start_PosX2 
   Start_PosY1 := Start_PosY2 
-  ;Sleep, 3000
   if(Delta > 400 )
   {
     Delta := 0
@@ -126,7 +127,7 @@ Return
 !#Enter::   ; dev testting
   if( not_work_flag ){
     Progress, Off
-    sleep, 200
+    sleep, 500
     Progress, B cwAqua w750 c00 zh0 fs36, in PLAYING session!!! %aggregate_active_min% minutes
     ;WinSet, TransColor, cwAqua 50, Work_Hours_script.ahk
   }else{
@@ -144,6 +145,7 @@ Return
   Progress, Off
 return
 
+;---------------------------------------------------------------------------------------------------
 ; what is the default combination of ^+w in notepad++? (ctrl+shift+w) = (close all)
 ; so I can add (ctrl+shift+win+W) for WORKING context...
 ^+#w::
@@ -155,6 +157,7 @@ return
   Progress, Off
 return
 
+;---------------------------------------------------------------------------------------------------
 ; (ctrl+shift+win+P) for "PLAYING" context...
 ^+#p::   ; not work session, 
   SoundBeep,600, 10
@@ -165,11 +168,12 @@ return
   Progress, Off
 return
 
+;---------------------------------------------------------------------------------------------------
 ; so I can add (ctrl+shift+win+W) for WORKING context...
 ^+#v::
-  Progress, B cwWhite w800 c00 zh0 fs36, Aggregated time %aggregate_active_hour%:%aggregate_active_min%
+  Progress,7: B cwWhite w800 c00 zh0 fs36, Aggregated time: %aggregate_active_hour%H %aggregate_active_min%M
   MsgBox, PAUSE
-  Progress, Off
+  Progress,7: Off
 return
 
 ;---------------------------------------------------------------------------------------------------
@@ -186,6 +190,7 @@ was_active_Timer:
   {
       aggregate_active_min := 0
       aggregate_active_hour := 0 ;;??
+      session_resting_min := 0
   
   }
   
@@ -239,18 +244,35 @@ was_active_Timer:
   else{
     ; give resting indication...
     aggregate_resting_min += 5
+    session_resting_min += 5
     if( Mod(aggregate_resting_min, 60) = 0 ){
       aggregate_resting_hour++
       aggregate_resting_min = 0
     }
-    Progress,1: B cwWhite y10 w800 c00 zh0 fs36, Resting time: %aggregate_resting_hour%:%aggregate_resting_min%
+    if( session_resting_min = 60 )
+    {
+      session_resting_hour++
+      session_resting_min = 0
+    }
+    ;resting_min_mod60 := Mod(aggregate_resting_min, 60)
+    ;Progress,1: B cwWhite y10 w800 c00 zh0 fs36, Resting time: %aggregate_resting_hour%:%aggregate_resting_min%
+    if( session_resting_min < 10 )
+    {
+      Progress,1: B cwWhite y10 w800 c00 zh0 fs36, Resting time: %session_resting_hour%:0%session_resting_min%
+    }else{
+      Progress,1: B cwWhite y10 w800 c00 zh0 fs36, Resting time: %session_resting_hour%:%session_resting_min%
+    }
+      if( DEBUG = 1 )
+      {
+        string4 = "session Resting time" %session_resting_min% "minutes" 
+        ComObjCreate("SAPI.SpVoice").Speak(string4)
+      }
   }
   SetTimer, tooltip_on_Timer, 3000
   a_last_YDay := A_YDay
   ; save the day
   IniWrite, %a_last_YDay%, C:\AHK\work_hour_params.txt, SISSION_DAY, a_last_YDay
 
-  
 }
 return
 
