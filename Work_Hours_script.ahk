@@ -22,8 +22,9 @@ Delta := 0
 not_work_flag := 0   ; by default, when opening or reloading the script it is in: WORKING session!
 aggregate_resting_min := 0
 session_resting_min := 0
+session_resting_hour := 0
 DEBUG := 1
-Version := 0.2
+Version := 0.3
 
 ;SetTimer, was_active_Timer, 5000
 ; 60000 (= 1 minute) ;   60000*5 = 300000 (5 minutes)  ; 50000 ( 10min <==> 1hour) 
@@ -204,6 +205,8 @@ was_active_Timer:
       aggregate_active_min += 5  ;in increments of 5 minutes
         string2 = "aggregate active time" %aggregate_active_min% "minutes" 
         ;ComObjCreate("SAPI.SpVoice").Speak(string2)
+      ;; reset the resting counter on each activity.
+      Gosub, ResetResting
       
       ; send current time to "aggregate" file
       FormatTime, DateString, YYYYMMDDHH24MISS, yyyy_MM_dd__HH:mm
@@ -263,9 +266,16 @@ was_active_Timer:
     }else{
       Progress,1: B cwWhite y10 w800 c00 zh0 fs36, Resting time: %session_resting_hour%:%session_resting_min%
     }
-      if( DEBUG = 1 )
-      {
-        string4 = "session Resting time" %session_resting_min% "minutes" 
+      if( DEBUG = 1 ){
+        if( session_resting_hour = 0 ){
+            string4 = "session Resting time" %session_resting_min% "minutes" %session_resting_min% "minutes" 
+        }else{
+          if( session_resting_hour = 1 ){
+            string4 = "session Resting time" "one hour and " %session_resting_min% "minutes" 
+          }else{
+            string4 = "session Resting time" %session_resting_hour% "hours, and" %session_resting_min% "minutes" 
+          }
+        }
         ComObjCreate("SAPI.SpVoice").Speak(string4)
       }
   }
@@ -274,6 +284,14 @@ was_active_Timer:
   ; save the day
   IniWrite, %a_last_YDay%, C:\AHK\work_hour_params.txt, SISSION_DAY, a_last_YDay
 
+}
+return
+
+ResetResting:
+{
+  aggregate_resting_min := 0 ; reset the resting counter on each activity.
+  session_resting_min := 0
+  session_resting_hour := 0
 }
 return
 
