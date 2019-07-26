@@ -43,4 +43,4 @@ Alt+Win+Enter
 by default, when opening or reloading the script it is in: WORKING session!
 
 ## Version
-V_0.2
+V_0.4

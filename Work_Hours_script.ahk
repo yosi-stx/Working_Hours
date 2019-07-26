@@ -24,7 +24,7 @@ aggregate_resting_min := 0
 session_resting_min := 0
 session_resting_hour := 0
 DEBUG := 1
-Version := 0.3
+Version := 0.4
 
 ;SetTimer, was_active_Timer, 5000
 ; 60000 (= 1 minute) ;   60000*5 = 300000 (5 minutes)  ; 50000 ( 10min <==> 1hour) 
