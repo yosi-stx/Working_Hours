@@ -36,7 +36,8 @@ Alt+Win+Enter
 |:----------:|:-------|
 |Ctrl+Shift+Win+W| Enter Normal Mode. (WORKING context)|
 |Ctrl+Shift+Win+P| Enter Alternative Mode. ("PLAYING" context)|
-|alt+win+Enter| view the current context|
+|alt+win+Enter| View the current context|
+|Ctrl+Shift+Win+V| View information (message removed when mouse move)|
 
 # default condition
 by default, when opening or reloading the script it is in: WORKING session!

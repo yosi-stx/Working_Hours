@@ -108,6 +108,7 @@ MouseGetPos, Start_PosX2, Start_PosY2
     Delta := 0
     was_active++
     Progress,1: OFF  ; remove resting message 
+    Progress,8: OFF  ; remove view info message 
     ;ToolTip, Mouse_Movement_Delta%Delta%, 1000, 5
     SetTimer, tooltip_on_Timer, 3000
   }
@@ -171,9 +172,9 @@ return
 ;---------------------------------------------------------------------------------------------------
 ; so I can add (ctrl+shift+win+W) for WORKING context...
 ^+#v::
-  Progress,7: B cwWhite w800 c00 zh0 fs36, Aggregated time: %aggregate_active_hour%H %aggregate_active_min%M
-  MsgBox, PAUSE
-  Progress,7: Off
+  Progress,8: B cwWhite w800 c00 zh0 fs36, Aggregated time: %aggregate_active_hour%H %aggregate_active_min%M `n Version: %Version%
+  ;MsgBox, PAUSE
+  ;Progress,7: Off
 return
 
 ;---------------------------------------------------------------------------------------------------
