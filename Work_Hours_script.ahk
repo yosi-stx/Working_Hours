@@ -173,7 +173,7 @@ return
 ;---------------------------------------------------------------------------------------------------
 ; so I can add (ctrl+shift+win+W) for WORKING context...
 ^+#v::
-  Progress,8: B cwWhite w800 c00 zh0 fs36, Aggregated time: %aggregate_active_hour%H %aggregate_active_min%M `n Version: %Version%
+  Progress,8: B cwWhite w800 c00 zh0 fs36, Aggregated time: %aggregate_active_hour%H %aggregate_active_min%M `nVersion: %Version% `nnot_work_flag=%not_work_flag%
   ;MsgBox, PAUSE
   ;Progress,7: Off
 return
@@ -268,7 +268,7 @@ was_active_Timer:
     }
       if( DEBUG = 1 ){
         if( session_resting_hour = 0 ){
-            string4 = "session Resting time" %session_resting_min% "minutes" %session_resting_min% "minutes" 
+            string4 = "session Resting time" %session_resting_min% "minutes" 
         }else{
           if( session_resting_hour = 1 ){
             string4 = "session Resting time" "one hour and " %session_resting_min% "minutes" 
