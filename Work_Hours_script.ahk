@@ -25,7 +25,7 @@ session_resting_min := 0
 session_resting_hour := 0
 DEBUG := 1
 Version := 0.5
-ScriptDateTime := "2019_07_27__13:52"
+ScriptDateTime := "2019_07_27__17:19"
 
 
 ;SetTimer, was_active_Timer, 5000
@@ -139,13 +139,9 @@ Return
     ;WinSet, TransColor, cwSilver 75, Work_Hours_script.ahk
     ;WinSet, transparent, 100, Work_Hours_script.ahk
   }
-  ;MsgBox, % Mod(aggregate_active_min, 60)
-  x:="7"
-  ;ComObjCreate("SAPI.SpVoice").Speak("aggregate active time" "minutes"%aggregate_active_min% )
-  ;ComObjCreate("SAPI.SpVoice").Speak("aggregate active time" "minutes"%x% )
-  ;string1 = "aggregate active time" %aggregate_active_min% "minutes" 
-  string1 = "time" %aggregate_active_min% "minutes" 
-  ComObjCreate("SAPI.SpVoice").Speak(string1)
+  ;string1 = "time" %aggregate_active_min% "minutes" 
+  ;ComObjCreate("SAPI.SpVoice").Speak(string1)
+  sleep, 1500
   Progress, Off
 return
 
