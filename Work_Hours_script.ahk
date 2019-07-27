@@ -24,7 +24,9 @@ aggregate_resting_min := 0
 session_resting_min := 0
 session_resting_hour := 0
 DEBUG := 1
-Version := 0.4
+Version := 0.5
+ScriptDateTime := "2019_07_27__13:52"
+
 
 ;SetTimer, was_active_Timer, 5000
 ; 60000 (= 1 minute) ;   60000*5 = 300000 (5 minutes)  ; 50000 ( 10min <==> 1hour) 
@@ -173,9 +175,24 @@ return
 ;---------------------------------------------------------------------------------------------------
 ; so I can add (ctrl+shift+win+W) for WORKING context...
 ^+#v::
-  Progress,8: B cwWhite w800 c00 zh0 fs36, Aggregated time: %aggregate_active_hour%H %aggregate_active_min%M `nVersion: %Version% `nnot_work_flag=%not_work_flag%
-  ;MsgBox, PAUSE
-  ;Progress,7: Off
+active_min_mod60 := Mod(aggregate_active_min, 60)
+Progress,8: B cwWhite w900 c00 zh0 fs18,
+(
+Aggregated working time: %aggregate_active_hour%H:%active_min_mod60%M    (i.e. %aggregate_active_min%M )
+Session resting time:    %session_resting_hour%H:%session_resting_min%M
+Version: %Version%
+Script Date & Time: %ScriptDateTime%
+not_work_flag=%not_work_flag%
+)
+;Progress,8: B cwWhite w800 c00 zh0 fs36,
+;(
+;hello, this is a
+;very long, multi-lined
+;example. AHK will also preserve this
+;formatting!!!!!!!!!!!
+;)
+;MsgBox, PAUSE
+;Progress,7: Off
 return
 
 ;---------------------------------------------------------------------------------------------------
@@ -200,13 +217,13 @@ was_active_Timer:
   {
     ToolTip, was_active=%was_active%, 1150, 5
     was_active := 0
+    ;; reset the resting counter on each activity.
+    Gosub, ResetResting
     if( not_work_flag = 0 )
     {
       aggregate_active_min += 5  ;in increments of 5 minutes
         string2 = "aggregate active time" %aggregate_active_min% "minutes" 
         ;ComObjCreate("SAPI.SpVoice").Speak(string2)
-      ;; reset the resting counter on each activity.
-      Gosub, ResetResting
       
       ; send current time to "aggregate" file
       FormatTime, DateString, YYYYMMDDHH24MISS, yyyy_MM_dd__HH:mm
