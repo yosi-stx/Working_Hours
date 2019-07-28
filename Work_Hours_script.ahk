@@ -10,7 +10,7 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #Persistent
 SetTitleMatchMode, 2
 SoundBeep 500,60
-MsgBox ,,, Work_Hours_script Wass reloaded ... Time: %A_Hour%:%A_Min%:%A_Sec%.,1
+MsgBox ,,, Work_Hours_script Was reloaded ... Time: %A_Hour%:%A_Min%:%A_Sec%.,1
 
 ;
 ; Set variable initial (default) velues
@@ -23,9 +23,11 @@ not_work_flag := 0   ; by default, when opening or reloading the script it is in
 aggregate_resting_min := 0
 session_resting_min := 0
 session_resting_hour := 0
+Last_session_work_min := 0     ; Last_session_work_min/hour is reset every resting session.
+Last_session_work_hour := 0
 DEBUG := 1
 Version := 0.5
-ScriptDateTime := "2019_07_27__17:19"
+ScriptDateTime := "2019_07_28__14:09"
 
 
 ;SetTimer, was_active_Timer, 5000
@@ -43,11 +45,21 @@ IfNotExist, %DirectoryCheckVar%
     if ErrorLevel   ; i.e. it's not blank or zero.
       MsgBox, Could not create "C:\AHK\"   folder,`n Please create it manualy :)
     else
+    {
       MsgBox,,, "C:\AHK\" folder was created `n Please dont delete it,5
+      FormatTime, DateString, YYYYMMDDHH24MISS, yyyy_MM_dd__HH:mm
+      FileAppend, %DateString%, C:\AHK\Aggregate_working_Hours.txt
+      FileAppend, " File was created", C:\AHK\Aggregate_working_Hours.txt
+      FileAppend, `n, C:\AHK\Aggregate_working_Hours.txt
+    }
 }
 else
 {
     MsgBox,,, "C:\AHK\" Folder Exist,2
+    FormatTime, DateString, YYYYMMDDHH24MISS, yyyy_MM_dd__HH:mm
+    FileAppend, %DateString%, C:\AHK\Aggregate_working_Hours.txt
+    FileAppend, " Script reloaded", C:\AHK\Aggregate_working_Hours.txt
+    FileAppend, `n, C:\AHK\Aggregate_working_Hours.txt
     ; read values from last script execution
     IfExist, C:\AHK\work_hour_params.txt
     {
@@ -169,12 +181,13 @@ return
 return
 
 ;---------------------------------------------------------------------------------------------------
-; so I can add (ctrl+shift+win+W) for WORKING context...
+; (ctrl+shift+win+V) for viewing glabal INFORMATION
 ^+#v::
 active_min_mod60 := Mod(aggregate_active_min, 60)
 Progress,8: B cwWhite w900 c00 zh0 fs18,
 (
 Aggregated working time: %aggregate_active_hour%H:%active_min_mod60%M    (i.e. %aggregate_active_min%M )
+Last session working time: %Last_session_work_hour%H:%Last_session_work_min%M 
 Session resting time:    %session_resting_hour%H:%session_resting_min%M
 Version: %Version%
 Script Date & Time: %ScriptDateTime%
@@ -218,6 +231,7 @@ was_active_Timer:
     if( not_work_flag = 0 )
     {
       aggregate_active_min += 5  ;in increments of 5 minutes
+      Last_session_work_min += 5  ;in increments of 5 minutes
         string2 = "aggregate active time" %aggregate_active_min% "minutes" 
         ;ComObjCreate("SAPI.SpVoice").Speak(string2)
       
@@ -241,7 +255,11 @@ was_active_Timer:
         MsgBox, PAUSE
         Progress, Off
       }
-      
+      if( Last_session_work_min = 60 )
+      {
+        Last_session_work_hour++
+        Last_session_work_min := 0
+      }
       if( Mod(aggregate_active_min, 60) = 0 ){
         aggregate_active_hour++ ;
         string3 = "aggregate active time" %aggregate_active_hour% "Hours" 
@@ -253,15 +271,18 @@ was_active_Timer:
       }
       FileAppend, `n, C:\AHK\Aggregate_working_Hours.txt
     }else{
+      ; in "Playing" session
       Progress, B cwTeal w850 c00 zh0 fs36, You ars still in NOT WORK session!!!
       sleep, 1500
       Progress, Off
     }
   }
   else{
-    ; give resting indication...
+    ; in "Resting" session
     aggregate_resting_min += 5
     session_resting_min += 5
+    Last_session_work_min := 0
+    Last_session_work_hour := 0
     if( Mod(aggregate_resting_min, 60) = 0 ){
       aggregate_resting_hour++
       aggregate_resting_min = 0
@@ -271,6 +292,8 @@ was_active_Timer:
       session_resting_hour++
       session_resting_min = 0
     }
+    ;
+    ; give resting indication...
     ;resting_min_mod60 := Mod(aggregate_resting_min, 60)
     ;Progress,1: B cwWhite y10 w800 c00 zh0 fs36, Resting time: %aggregate_resting_hour%:%aggregate_resting_min%
     if( session_resting_min < 10 )
@@ -342,3 +365,4 @@ return
 ; Send, %DateString%
 ; 
 
+; 2019_07_28__14:08  adding: 1) working session info. 2) reloaded info into file.
