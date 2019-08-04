@@ -167,6 +167,8 @@ return
   Progress, B cwSilver w450 c00 zh0 fs36, Get back to work
   sleep, 2500
   Progress, Off
+  ; start 5 minutes time counting from zero (isolate working from playing session)
+  SetTimer, was_active_Timer, 300000
 return
 
 ;---------------------------------------------------------------------------------------------------
@@ -178,6 +180,8 @@ return
   Progress, B cwAqua w750 c00 zh0 fs36, You ars in NOT WORK session!!!
   sleep, 2500
   Progress, Off
+  ; start 5 minutes time counting from zero (isolate playing from working session)
+  SetTimer, was_active_Timer, 300000
 return
 
 ;---------------------------------------------------------------------------------------------------
@@ -366,3 +370,4 @@ return
 ; 
 
 ; 2019_07_28__14:08  adding: 1) working session info. 2) reloaded info into file.
+; 2019_08_04__10:40  ; start 5 minutes time counting from zero (isolate playing from working session)
