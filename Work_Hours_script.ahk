@@ -25,7 +25,7 @@ session_resting_min := 0
 session_resting_hour := 0
 Last_session_work_min := 0     ; Last_session_work_min/hour is reset every resting session.
 Last_session_work_hour := 0
-DEBUG := 1
+DEBUG := 0
 Version := 0.5
 ScriptDateTime := "2019_07_28__14:09"
 
@@ -144,7 +144,8 @@ Return
   if( not_work_flag ){
     Progress, Off
     sleep, 500
-    Progress, B cwAqua w750 c00 zh0 fs36, in PLAYING session!!! %aggregate_active_min% minutes
+    ;Progress, B cwAqua w750 c00 zh0 fs36, in PLAYING session!!! %aggregate_active_min% minutes
+    Progress, B cw007FFF w750 c00 zh0 fs36, in PLAYING session!!! %aggregate_active_min% minutes
     ;WinSet, TransColor, cwAqua 50, Work_Hours_script.ahk
   }else{
     Progress, B cwSilver w740 c00 zh0 fs36, in WORKING session!!! %aggregate_active_min% minutes
@@ -276,8 +277,8 @@ was_active_Timer:
       FileAppend, `n, C:\AHK\Aggregate_working_Hours.txt
     }else{
       ; in "Playing" session
-      Progress, B cwTeal w850 c00 zh0 fs36, You ars still in NOT WORK session!!!
-      sleep, 1500
+      Progress, B cwTeal  y10  w850 c00 zh0 fs36, You ars still in NOT WORK session!!!
+      sleep, 1000
       Progress, Off
     }
   }
