@@ -277,9 +277,23 @@ was_active_Timer:
       FileAppend, `n, C:\AHK\Aggregate_working_Hours.txt
     }else{
       ; in "Playing" session
-      Progress, B cwTeal  y10  w850 c00 zh0 fs36, You ars still in NOT WORK session!!!
-      sleep, 1000
-      Progress, Off
+      ;Progress, B cwTeal  y10  w850 c00 zh0 fs36, You ars still in NOT WORK session!!!
+      Progress,1: B cwFE0024  y10 x500 w900 c00 H75 zh0 fs36, 
+      Progress,2: B cwFF7A01  y10 x650 w750 c00 H75 zh0 fs36, 
+      Progress,3: B cwFFEF01  y10 x800 w600 c00 H75 zh0 fs36, 
+      Progress,4: B cw49A618  y10 x950 w450 c00 H75 zh0 fs36, 
+      Progress,5: B cw0061A5  y10 x1100 w300 c00 H75 zh0 fs36, 
+      Progress,6: B cw820096  y10 x1250 w150 c00 H75 zh0 fs36, 
+      sleep, 300
+      Run, TRSPT.ahk "You ars still in NOT WORK session!!!" 
+
+      sleep, 1500
+      Progress,1: off
+      Progress,2: off
+      Progress,3: off
+      Progress,4: off
+      Progress,5: off
+      Progress,6: off
     }
   }
   else{
