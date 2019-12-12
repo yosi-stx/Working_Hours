@@ -40,7 +40,8 @@ Alt+Win+Enter
 |Ctrl+Shift+Win+V| View information (message removed when mouse move)|
 
 # default condition
-by default, when opening or reloading the script it is in: WORKING session!
+By default, when opening or reloading the script it is in: WORKING session!
+A small Red or Green Icon will be on the top left corner of the screen according to working state.
 
 ## Version
-V_0.4
+V_0.6

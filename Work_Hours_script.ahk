@@ -26,8 +26,8 @@ session_resting_hour := 0
 Last_session_work_min := 0     ; Last_session_work_min/hour is reset every resting session.
 Last_session_work_hour := 0
 DEBUG := 0
-Version := 0.5
-ScriptDateTime := "2019_07_28__14:09"
+Version := 0.6
+ScriptDateTime := "2019_12_12__23:09"
 
 
 ;SetTimer, was_active_Timer, 5000
@@ -76,6 +76,12 @@ else
         sleep, 2000
         Progress,7: Off
         ;MsgBox,,, Loaded params: `n hours: %aggregate_active_hour%`n minutes: %aggregate_active_min% ,3
+        ;2019_12_12 add constatnt playy/workk indication
+        if( not_work_flag ){
+          Progress,6: B cwFE0025  y0 x00 w9 c00 H15 zh0 fs10 zw0 zx0 zy0, Playy
+        }else{
+          Progress,6: B cw00FE24  y0 x00 w9 c00 H15 zh0 fs10 zw0 zx0 zy0, Workk
+        }
       }
     }
 }
@@ -170,6 +176,8 @@ return
   Progress, Off
   ; start 5 minutes time counting from zero (isolate working from playing session)
   SetTimer, was_active_Timer, 300000
+  ;2019_12_12 new constant indication
+  Progress,6: B cw00FE24  y0 x00 w9 c00 H15 zh0 fs10 zw0 zx0 zy0, Workk
 return
 
 ;---------------------------------------------------------------------------------------------------
@@ -183,6 +191,8 @@ return
   Progress, Off
   ; start 5 minutes time counting from zero (isolate playing from working session)
   SetTimer, was_active_Timer, 300000
+  ;2019_12_12 new constant indication
+  Progress,6: B cwFE0025  y0 x00 w9 c00 H15 zh0 fs10 zw0 zx0 zy0, Playy
 return
 
 ;---------------------------------------------------------------------------------------------------
@@ -275,6 +285,8 @@ was_active_Timer:
         ;MsgBox ,,, %aggregate_active_hour% Hours of work aggragated at ... Time: %A_Hour%:%A_Min%:%A_Sec%.,1
       }
       FileAppend, `n, C:\AHK\Aggregate_working_Hours.txt
+      ;2019_12_12 new constant indication
+      Progress,6: B cw00FE24  y0 x00 w9 c00 H15 zh0 fs10 zw0 zx0 zy0, Workk
     }else{
       ; in "Playing" session
       ;Progress, B cwTeal  y10  w850 c00 zh0 fs36, You ars still in NOT WORK session!!!
@@ -294,6 +306,8 @@ was_active_Timer:
       Progress,4: off
       Progress,5: off
       Progress,6: off
+      ;2019_12_12 new constant indication
+      Progress,6: B cwFE0025  y0 x00 w9 c00 H15 zh0 fs10 zw0 zx0 zy0, Playy
     }
   }
   else{
