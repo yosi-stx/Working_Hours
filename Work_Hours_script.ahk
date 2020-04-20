@@ -239,7 +239,7 @@ was_active_Timer:
   
   if was_active > 0
   {
-    ToolTip, was_active=%was_active%, 1150, 5
+    ; ToolTip, was_active=%was_active%, 1150, 5 ;2020_04_20 - remove the annoying ToolTip.
     was_active := 0
     ;; reset the resting counter on each activity.
     Gosub, ResetResting
