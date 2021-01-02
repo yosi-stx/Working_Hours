@@ -277,8 +277,11 @@ was_active_Timer:
       }
       if( Mod(aggregate_active_min, 60) = 0 ){
         aggregate_active_hour++ ;
-        string3 = "aggregate active time" %aggregate_active_hour% "Hours" 
-        ComObjCreate("SAPI.SpVoice").Speak(string3)
+        if( aggregate_active_hour >=4 )
+        {
+          string3 = "aggregate active time" %aggregate_active_hour% "Hours" 
+          ComObjCreate("SAPI.SpVoice").Speak(string3)
+        }
         FileAppend, " Aggregate Hours: ", C:\AHK\Aggregate_working_Hours.txt
         FileAppend, %aggregate_active_hour%, C:\AHK\Aggregate_working_Hours.txt
         IniWrite, %aggregate_active_hour%, C:\AHK\work_hour_params.txt, AGGREGATE_HOUR, aggregate_active_hour
