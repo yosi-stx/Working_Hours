@@ -186,7 +186,7 @@ return
   SoundBeep,600, 10
   SoundBeep,600, 10
   not_work_flag := 1
-  Progress, B cwAqua w750 c00 zh0 fs36, You ars in NOT WORK session!!!
+  Progress, B cwAqua w770 c00 zh0 fs36, You are in NOT WORK session!!!
   sleep, 2500
   Progress, Off
   ; start 5 minutes time counting from zero (isolate playing from working session)
@@ -300,7 +300,7 @@ was_active_Timer:
       Progress,5: B cw0061A5  y10 x1100 w300 c00 H75 zh0 fs36, 
       Progress,6: B cw820096  y10 x1250 w150 c00 H75 zh0 fs36, 
       sleep, 300
-      Run, TRSPT.ahk "You ars still in NOT WORK session!!!" 
+      Run, TRSPT.ahk "You are still NOT in WORK session!"  
 
       sleep, 1500
       Progress,1: off
