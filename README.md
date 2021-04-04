@@ -44,4 +44,4 @@ By default, when opening or reloading the script it is in: WORKING session!
 A small Red or Green Icon will be on the top left corner of the screen according to working state.
 
 ## Version
-V_0.6
+V_1.0 - update the executable file.

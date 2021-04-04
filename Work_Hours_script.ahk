@@ -26,8 +26,8 @@ session_resting_hour := 0
 Last_session_work_min := 0     ; Last_session_work_min/hour is reset every resting session.
 Last_session_work_hour := 0
 DEBUG := 0
-Version := 0.6
-ScriptDateTime := "2019_12_12__23:09"
+Version := 1.0
+ScriptDateTime := "2021_04_04__19_43"
 
 
 ;SetTimer, was_active_Timer, 5000
