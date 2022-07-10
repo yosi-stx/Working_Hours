@@ -1,6 +1,9 @@
 ; C:\Yosi\AHK\PublicProjects.git\Working_Hours\Work_Hours_script.ahk
 ; This script automatically save the aggregate working hours according to user activity on his PC
 ; 
+; updates:
+; 2022_07_10: change the rollover time from midnight to 4 am.
+; SISSION = a period devoted to a particular activity. (spelling error instead of SESSION)
 
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
@@ -18,6 +21,8 @@ full_screen := 0
 was_active := 0
 aggregate_active_min := 0
 aggregate_active_hour := 0
+aggregate_play_min := 0
+aggregate_play_hour := 0
 Delta := 0
 not_work_flag := 0   ; by default, when opening or reloading the script it is in: WORKING session!
 aggregate_resting_min := 0
@@ -26,8 +31,8 @@ session_resting_hour := 0
 Last_session_work_min := 0     ; Last_session_work_min/hour is reset every resting session.
 Last_session_work_hour := 0
 DEBUG := 0
-Version := 1.0
-ScriptDateTime := "2021_04_04__19_43"
+Version := 1.1
+ScriptDateTime := "2022_07_10__21_01"
 
 
 ;SetTimer, was_active_Timer, 5000
@@ -65,7 +70,7 @@ else
     {
       IniRead, a_last_YDay, C:\AHK\work_hour_params.txt, SISSION_DAY, a_last_YDay
       ; is the same day? A_YDay 
-      if (a_last_YDay = A_YDay)
+      if( is_same_day(a_last_YDay) )
       {
         IniRead, aggregate_active_min, C:\AHK\work_hour_params.txt, AGGREGATE_MIN, aggregate_active_min
         IniRead, aggregate_active_hour, C:\AHK\work_hour_params.txt, AGGREGATE_HOUR, aggregate_active_hour
@@ -131,7 +136,7 @@ MouseGetPos, Start_PosX2, Start_PosY2
     Progress,1: OFF  ; remove resting message 
     Progress,8: OFF  ; remove view info message 
     ;ToolTip, Mouse_Movement_Delta%Delta%, 1000, 5
-    SetTimer, tooltip_on_Timer, 3000
+    SetTimer, tooltip_on_Timer, 3000  ; 3 seconds timer to remove ToolTip.
   }
 return
 }
@@ -204,9 +209,12 @@ Progress,8: B cwWhite w900 c00 zh0 fs18,
 Aggregated working time: %aggregate_active_hour%H:%active_min_mod60%M    (i.e. %aggregate_active_min%M )
 Last session working time: %Last_session_work_hour%H:%Last_session_work_min%M 
 Session resting time:    %session_resting_hour%H:%session_resting_min%M
+More info:
+Aggregate play time: (i.e. %aggregate_play_min%M )
 Version: %Version%
 Script Date & Time: %ScriptDateTime%
 not_work_flag=%not_work_flag%
+
 )
 ;Progress,8: B cwWhite w800 c00 zh0 fs36,
 ;(
@@ -224,17 +232,38 @@ return
 ;---------------------------------------------------------------------------------------------------
 ;---------------------------------------------------------------------------------------------------
 ;Gosub, SaveIarBreakPoint
+is_same_day(day)
+{
+;~ a_last_YDay - is not defined here as local
+  if( A_Hour > 4 ) ; stay in previous session day until 4 am
+  {
+    if (day = A_YDay)
+    {
+		return true
+    }
+  }
+  else
+  {
+    if (day = A_YDay-1)
+    {
+		return true
+    }
+  }
+  return false
+}
 
-; main timer: for aggragation of activity time.
+
+; main timer: for aggregation of activity time.
 was_active_Timer:
 {
   ; is a new day?
-  if !(a_last_YDay = A_YDay)
+  if( !is_same_day(a_last_YDay) )
   {
-      aggregate_active_min := 0
-      aggregate_active_hour := 0 ;;??
-      session_resting_min := 0
-  
+        aggregate_active_min := 0
+        aggregate_active_hour := 0 ;;??
+        session_resting_min := 0
+        aggregate_play_min := 0
+        aggregate_play_hour := 0
   }
   
   if was_active > 0
@@ -275,7 +304,8 @@ was_active_Timer:
         Last_session_work_hour++
         Last_session_work_min := 0
       }
-      if( Mod(aggregate_active_min, 60) = 0 ){
+      if( Mod(aggregate_active_min, 60) = 0 )
+      {
         aggregate_active_hour++ ;
         if( aggregate_active_hour >=4 )
         {
@@ -292,6 +322,12 @@ was_active_Timer:
       Progress,6: B cw00FE24  y0 x00 w9 c00 H15 zh0 fs10 zw0 zx0 zy0, Workk
     }else{
       ; in "Playing" session
+      aggregate_play_min += 5  ;in increments of 5 minutes
+      FormatTime, DateString, YYYYMMDDHH24MISS, yyyy_MM_dd__HH:mm
+      FileAppend, %DateString%, C:\AHK\Aggregate_playing_Hours.txt
+      FileAppend, " agg min: ", C:\AHK\Aggregate_playing_Hours.txt
+      FileAppend, %aggregate_play_min%, C:\AHK\Aggregate_playing_Hours.txt
+      FileAppend, `n, C:\AHK\Aggregate_playing_Hours.txt
       ;Progress, B cwTeal  y10  w850 c00 zh0 fs36, You ars still in NOT WORK session!!!
       Progress,1: B cwFE0024  y10 x500 w900 c00 H75 zh0 fs36, 
       Progress,2: B cwFF7A01  y10 x650 w750 c00 H75 zh0 fs36, 
@@ -351,8 +387,16 @@ was_active_Timer:
         ComObjCreate("SAPI.SpVoice").Speak(string4)
       }
   }
-  SetTimer, tooltip_on_Timer, 3000
-  a_last_YDay := A_YDay
+  SetTimer, tooltip_on_Timer, 3000 ; 3 seconds timer to remove ToolTip.
+  if( A_Hour > 4 ) ; stay in previous session day until 4 am
+  {
+    a_last_YDay := A_YDay
+  }
+  else
+  {
+    a_last_YDay := A_YDay - 1 ; we should not reset the session day aggregation indications.
+  }
+  
   ; save the day
   IniWrite, %a_last_YDay%, C:\AHK\work_hour_params.txt, SISSION_DAY, a_last_YDay
 
@@ -403,3 +447,4 @@ return
 
 ; 2019_07_28__14:08  adding: 1) working session info. 2) reloaded info into file.
 ; 2019_08_04__10:40  ; start 5 minutes time counting from zero (isolate playing from working session)
+; 2022_07_10__21_01  ; 1) adding aggregate_play_min 2) change the rollover time from midnight to 4 am
