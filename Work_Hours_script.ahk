@@ -183,6 +183,9 @@ return
   SetTimer, was_active_Timer, 300000
   ;2019_12_12 new constant indication
   Progress,6: B cw00FE24  y0 x00 w9 c00 H15 zh0 fs10 zw0 zx0 zy0, Workk
+  ; reset the last session parameters when Switching back to work.
+  Last_session_work_min := 0     
+  Last_session_work_hour := 0
 return
 
 ;---------------------------------------------------------------------------------------------------
@@ -231,7 +234,6 @@ return
 ;---------------------------------------------------------------------------------------------------
 ;---------------------------------------------------------------------------------------------------
 ;---------------------------------------------------------------------------------------------------
-;Gosub, SaveIarBreakPoint
 is_same_day(day)
 {
 ;~ a_last_YDay - is not defined here as local
@@ -264,6 +266,9 @@ was_active_Timer:
         session_resting_min := 0
         aggregate_play_min := 0
         aggregate_play_hour := 0
+        Last_session_work_min := 0     
+        Last_session_work_hour := 0
+
   }
   
   if was_active > 0
