@@ -450,6 +450,10 @@ return
 ; Send, %DateString%
 ; 
 
+; history changes:
 ; 2019_07_28__14:08  adding: 1) working session info. 2) reloaded info into file.
 ; 2019_08_04__10:40  ; start 5 minutes time counting from zero (isolate playing from working session)
 ; 2022_07_10__21_01  ; 1) adding aggregate_play_min 2) change the rollover time from midnight to 4 am
+
+; bug notification:
+; 2022_09_11: sometimes (rare) after hibernate wakeup the aggregate_active_X is not reset in the next day?
