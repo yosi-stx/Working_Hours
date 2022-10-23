@@ -4,6 +4,11 @@
 ; updates:
 ; 2022_07_10: change the rollover time from midnight to 4 am.
 ; SISSION = a period devoted to a particular activity. (spelling error instead of SESSION)
+; 2022_10_23: adding some voice of reload of script.
+;
+; parameters file:
+; C:\AHK\work_hour_params.txt
+; file:///C:/AHK/work_hour_params.txt
 
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
@@ -31,8 +36,8 @@ session_resting_hour := 0
 Last_session_work_min := 0     ; Last_session_work_min/hour is reset every resting session.
 Last_session_work_hour := 0
 DEBUG := 0
-Version := 1.1
-ScriptDateTime := "2022_07_10__21_01"
+Version := 1.2
+ScriptDateTime := "2022_10_23__23_35"
 
 
 ;SetTimer, was_active_Timer, 5000
@@ -78,8 +83,14 @@ else
         active_min_mod60 := Mod(aggregate_active_min, 60)
         Progress,7: B cwWhite w800 c00 zh0 fs36, Aggregated time %aggregate_active_hour%:%active_min_mod60%
         ;MsgBox, PAUSE
-        sleep, 2000
-        Progress,7: Off
+        ;sleep, 2000
+        Settimer, general_progress_timer, -2000
+
+        ; voice message that it was reloaded in the same day:
+        ComObjCreate("SAPI.SpVoice").Speak("reloaded in the same day as ini file ")
+        string1 = "time" %aggregate_active_min% "minutes" 
+        ComObjCreate("SAPI.SpVoice").Speak(string1)
+
         ;MsgBox,,, Loaded params: `n hours: %aggregate_active_hour%`n minutes: %aggregate_active_min% ,3
         ;2019_12_12 add constatnt playy/workk indication
         if( not_work_flag ){
@@ -87,6 +98,16 @@ else
         }else{
           Progress,6: B cw00FE24  y0 x00 w9 c00 H15 zh0 fs10 zw0 zx0 zy0, Workk
         }
+      }
+      else
+      { 
+        ComObjCreate("SAPI.SpVoice").Speak("reloaded, day was changed since last session")
+        ; this else statement is redundant since the following variables are initialized 
+        ; by default to zero.
+;        aggregate_active_min := 0
+;        aggregate_active_hour := 0
+;        aggregate_play_min := 0
+;        aggregate_play_hour := 0
       }
     }
 }
@@ -145,7 +166,7 @@ return
 
 ;---------------------------------------------------------------------------------------------------
 ; (ctrl+win+R) : for reloading the macro
-^#r::
+^#r::    ; reloading the macro
 Reload   ; yg20100211 - a shortkey for reload
 SoundBeep,600, 10
 Return
@@ -439,6 +460,10 @@ DetectMouseMovement:
 	g_ypos := g_ypos1
 	g_xpos := g_xpos1
 }
+return
+
+general_progress_timer: ; timer to turn of message
+Progress,7: Off
 return
 
 

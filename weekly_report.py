@@ -73,3 +73,14 @@ print("last_week: ", last_week)
 print("last_monday: ", last_monday)
 print("last_2_monday: ", last_2_monday)
 print("----------------------")
+
+
+# 2022_09_19
+# working hours from last 2 Monday:  9.583333333333334
+# working Days from last 2 Monday :  1.1274509803921569
+# working hours from last week:  6.416666666666667
+# working Days from last week :  0.7549019607843137
+# Traceback (most recent call last):
+#   File "C:\Yosi\AHK\PublicProjects.git\Working_Hours\weekly_report.py", line 63, in <module>
+#     print("working hours from last Monday: ", last_monday_count/12) # by 8.5 working hours a day
+# NameError: name 'last_monday_count' is not defined
