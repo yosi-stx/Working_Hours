@@ -1,14 +1,21 @@
 ; C:\Yosi\AHK\PublicProjects.git\Working_Hours\Work_Hours_script.ahk
+; file:///C:/Yosi/AHK/PublicProjects.git/Working_Hours/
 ; This script automatically save the aggregate working hours according to user activity on his PC
 ; 
 ; updates:
 ; 2022_07_10: change the rollover time from midnight to 4 am.
 ; SISSION = a period devoted to a particular activity. (spelling error instead of SESSION)
 ; 2022_10_23: adding some voice of reload of script.
+; 2022_12_11: adding timer for checking wakeup fro hibernate/sleep.
 ;
 ; parameters file:
 ; C:\AHK\work_hour_params.txt
 ; file:///C:/AHK/work_hour_params.txt
+;
+; other housekeeping files:
+; file:///C:/AHK/Aggregate_playing_Hours.txt
+; file:///C:/AHK/Aggregate_working_Hours.txt
+; file:///C:/AHK/ohter_info_working_Hours.txt
 
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
@@ -36,8 +43,8 @@ session_resting_hour := 0
 Last_session_work_min := 0     ; Last_session_work_min/hour is reset every resting session.
 Last_session_work_hour := 0
 DEBUG := 0
-Version := 1.2
-ScriptDateTime := "2022_10_23__23_35"
+Version := 1.3
+ScriptDateTime := "2022_12_11__19_11"
 
 
 ;SetTimer, was_active_Timer, 5000
@@ -45,6 +52,7 @@ ScriptDateTime := "2022_10_23__23_35"
 ; SetTimer, was_active_Timer, 50000  ;;; this line for debug and development of this script
 SetTimer, was_active_Timer, 300000   ;;; this line for REAL MEASURMENT !!!
 SetTimer, Mouse_Movement_Timer_Func, 100
+SetTimer, Check_Wake_Up_Timer_Func, 10000 ; every 10 seconds check if it was a "wakeup"
 
 ; automatically create a C:\AHK folder
 ; is folder exist?
@@ -186,8 +194,9 @@ Return
   }
   ;string1 = "time" %aggregate_active_min% "minutes" 
   ;ComObjCreate("SAPI.SpVoice").Speak(string1)
-  sleep, 1500
-  Progress, Off
+  Settimer, Progress_off_timer, -1500  
+  ; sleep, 1500
+  ; Progress, Off
 return
 
 ;---------------------------------------------------------------------------------------------------
@@ -198,8 +207,9 @@ return
   SoundBeep,600, 10
   not_work_flag := 0
   Progress, B cwSilver w450 c00 zh0 fs36, Get back to work
-  sleep, 2500
-  Progress, Off
+  Settimer, Progress_off_timer, -2500  
+  ; sleep, 2500
+  ; Progress, Off
   ; start 5 minutes time counting from zero (isolate working from playing session)
   SetTimer, was_active_Timer, 300000
   ;2019_12_12 new constant indication
@@ -207,6 +217,13 @@ return
   ; reset the last session parameters when Switching back to work.
   Last_session_work_min := 0     
   Last_session_work_hour := 0
+  
+  FileAppend, `n, C:\AHK\ohter_info_working_Hours.txt
+  FormatTime, DateString, YYYYMMDDHH24MISS, yyyy_MM_dd__HH_mm
+  FileAppend, %DateString%, C:\AHK\ohter_info_working_Hours.txt
+  FileAppend, " Switched to WORKING context...", C:\AHK\ohter_info_working_Hours.txt
+  FileAppend, `n, C:\AHK\ohter_info_working_Hours.txt
+  
 return
 
 ;---------------------------------------------------------------------------------------------------
@@ -216,12 +233,20 @@ return
   SoundBeep,600, 10
   not_work_flag := 1
   Progress, B cwAqua w770 c00 zh0 fs36, You are in NOT WORK session!!!
-  sleep, 2500
-  Progress, Off
+  Settimer, Progress_off_timer, -2500
+  ; sleep, 2500
+  ; Progress, Off
   ; start 5 minutes time counting from zero (isolate playing from working session)
   SetTimer, was_active_Timer, 300000
   ;2019_12_12 new constant indication
   Progress,6: B cwFE0025  y0 x00 w9 c00 H15 zh0 fs10 zw0 zx0 zy0, Playy
+
+  FileAppend, `n, C:\AHK\ohter_info_working_Hours.txt
+  FormatTime, DateString, YYYYMMDDHH24MISS, yyyy_MM_dd__HH_mm
+  FileAppend, %DateString%, C:\AHK\ohter_info_working_Hours.txt
+  FileAppend, " Switched to PLAYING context...", C:\AHK\ohter_info_working_Hours.txt
+  FileAppend, `n, C:\AHK\ohter_info_working_Hours.txt
+
 return
 
 ;---------------------------------------------------------------------------------------------------
@@ -466,6 +491,67 @@ general_progress_timer: ; timer to turn of message
 Progress,7: Off
 return
 
+Check_Wake_Up_Timer_Func:
+{
+delta_trom_last_time := A_Now
+EnvSub, delta_trom_last_time, %prev_time%, Seconds
+
+if( delta_trom_last_time > 600 ) ; 600 seconds = 10 minutes it was not active!
+;if( delta_trom_last_time > 30 ) ; 30 seconds  for debug
+{
+  ; do I need to use Floor() ?
+  delta_trom_last_time_minutes := Floor(delta_trom_last_time/60)
+  delta_trom_last_time_seconds := Mod(delta_trom_last_time,60)
+  delta_trom_last_time_hours := Floor(delta_trom_last_time_minutes/60)
+  delta_trom_last_time_minutes := Mod(delta_trom_last_time_minutes,60)
+  if( delta_trom_last_time_hours > 0 )
+  {
+    MsgBox,,, delta_trom_last_time:  %delta_trom_last_time% | hours: %delta_trom_last_time_hours%  | minutes: %delta_trom_last_time_minutes%  | seconds: %delta_trom_last_time_seconds%  , 5  ;180 ; display it for 3 minutes.
+  }
+  else
+  {
+    MsgBox,,, delta_trom_last_time:  %delta_trom_last_time% | minutes: %delta_trom_last_time_minutes%  | seconds: %delta_trom_last_time_seconds%  , 5  ;180 ; display it for 3 minutes.
+  }
+  ;FormatTime, DateString, YYYYMMDDHH24MISS, yyyy_MM_dd__HH:mm
+  FileAppend, `n, C:\AHK\ohter_info_working_Hours.txt
+  FileAppend, %A_Now%  , C:\AHK\ohter_info_working_Hours.txt
+  FileAppend, ' ' wakeup from sleep, C:\AHK\ohter_info_working_Hours.txt
+  FileAppend, `n, C:\AHK\ohter_info_working_Hours.txt
+  FileAppend,  delta_trom_last_time: `n, C:\AHK\ohter_info_working_Hours.txt
+  FileAppend, hours: %delta_trom_last_time_hours%  minutes: %delta_trom_last_time_minutes%  seconds: %delta_trom_last_time_seconds% , C:\AHK\ohter_info_working_Hours.txt
+  if( not_work_flag = 1 ) ; after wakeup from sleep.
+  {
+    ; wakeup from sleep in playing session.
+    ComObjCreate("SAPI.SpVoice").Speak("wakeup from sleep in playing session.")
+    MsgBox, 262180, , Do you want to switch to WORKING session?
+    IfMsgBox Yes
+    {
+      not_work_flag := 0
+      Progress, B cwSilver w750 c00 zh0 fs36, you switched into WORKING session!!!
+    }
+    else
+    {
+      Progress, B cw007FFF w750 c00 zh0 fs36, you stay in PLAYING session!!!
+    }
+    Settimer, Progress_off_timer, -2500
+  }
+  else
+  {
+    ; wakeup from sleep in working session.
+    ComObjCreate("SAPI.SpVoice").Speak("wakeup from sleep in working session.")
+  }
+}
+prev_time := A_Now
+return
+}
+
+; use the following by:
+; Settimer, Progress_off_timer, -3000 ; turn off the progress message in 3. sec
+
+Progress_off_timer: ; timer to turn of message
+Progress, Off
+return
+
 
 ; // from other macros:
 ; // ------------------
@@ -479,6 +565,9 @@ return
 ; 2019_07_28__14:08  adding: 1) working session info. 2) reloaded info into file.
 ; 2019_08_04__10:40  ; start 5 minutes time counting from zero (isolate playing from working session)
 ; 2022_07_10__21_01  ; 1) adding aggregate_play_min 2) change the rollover time from midnight to 4 am
+; 2022_12_11__18_50  ; adding Check_Wake_Up_Timer_Func
 
 ; bug notification:
 ; 2022_09_11: sometimes (rare) after hibernate wakeup the aggregate_active_X is not reset in the next day?
+; 2022_12_11: when wakeup from hibernate/sleep, the timers are exhausted, hence we get always 5 minutes even if they did not passed yet.
+ 
