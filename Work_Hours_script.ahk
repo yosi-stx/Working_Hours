@@ -22,6 +22,12 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #SingleInstance force
 
+; icon_file_name = %A_WorkingDir%\icons\HW_icon.ico
+IfExist, %A_WorkingDir%\icons\HW_icon.ico
+{
+  Menu, Tray, Icon,%A_WorkingDir%\icons\HW_icon.ico
+}
+
 #Persistent
 SetTitleMatchMode, 2
 SoundBeep 500,60
