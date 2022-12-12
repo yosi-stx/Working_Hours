@@ -514,20 +514,21 @@ if( delta_trom_last_time > 600 ) ; 600 seconds = 10 minutes it was not active!
   }
   ;FormatTime, DateString, YYYYMMDDHH24MISS, yyyy_MM_dd__HH:mm
   FileAppend, `n, C:\AHK\ohter_info_working_Hours.txt
-  FileAppend, %A_Now%  , C:\AHK\ohter_info_working_Hours.txt
-  FileAppend, ' ' wakeup from sleep, C:\AHK\ohter_info_working_Hours.txt
-  FileAppend, `n, C:\AHK\ohter_info_working_Hours.txt
-  FileAppend,  delta_trom_last_time: `n, C:\AHK\ohter_info_working_Hours.txt
+  FormatTime, DateString, YYYYMMDDHH24MISS, yyyy_MM_dd__HH_mm
+  FileAppend, %DateString%, C:\AHK\ohter_info_working_Hours.txt
+  FileAppend, .. delta_trom_last_time: , C:\AHK\ohter_info_working_Hours.txt
   FileAppend, hours: %delta_trom_last_time_hours%  minutes: %delta_trom_last_time_minutes%  seconds: %delta_trom_last_time_seconds% , C:\AHK\ohter_info_working_Hours.txt
   if( not_work_flag = 1 ) ; after wakeup from sleep.
   {
     ; wakeup from sleep in playing session.
     ComObjCreate("SAPI.SpVoice").Speak("wakeup from sleep in playing session.")
-    MsgBox, 262180, , Do you want to switch to WORKING session?
+    txt1 := Do you want to switch to WORKING session? 
+    MsgBox, 262180, ,  %delta_trom_last_time_hours% hours    %delta_trom_last_time_minutes% minutes   %delta_trom_last_time_seconds% seconds`n`n`n .. Do you want to switch to WORKING session?
     IfMsgBox Yes
     {
       not_work_flag := 0
       Progress, B cwSilver w750 c00 zh0 fs36, you switched into WORKING session!!!
+      Progress,6: B cw00FE24  y0 x00 w9 c00 H15 zh0 fs10 zw0 zx0 zy0, Workk
     }
     else
     {
