@@ -22,6 +22,11 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #SingleInstance force
 
+Menu, Tray, Add  ; Creates a separator line.
+Menu, Tray, Add  ; Creates a separator line.
+Menu, Tray, Add,  Reset Aggregate Active Time, ResetAggregateActiveTimesMenuHandler  ; Creates a new menu item.
+Menu, Tray, Add  ; Creates a separator line.
+
 ; icon_file_name = %A_WorkingDir%\icons\HW_icon.ico
 IfExist, %A_WorkingDir%\icons\HW_icon.ico
 {
@@ -50,7 +55,7 @@ Last_session_work_min := 0     ; Last_session_work_min/hour is reset every resti
 Last_session_work_hour := 0
 DEBUG := 0
 Version := 1.3
-ScriptDateTime := "2022_12_11__19_11"
+ScriptDateTime := "2025_07_15__13_39"
 
 
 ;SetTimer, was_active_Timer, 5000
@@ -372,7 +377,7 @@ was_active_Timer:
         FileAppend, " Aggregate Hours: ", C:\AHK\Aggregate_working_Hours.txt
         FileAppend, %aggregate_active_hour%, C:\AHK\Aggregate_working_Hours.txt
         IniWrite, %aggregate_active_hour%, C:\AHK\work_hour_params.txt, AGGREGATE_HOUR, aggregate_active_hour
-        ;MsgBox ,,, %aggregate_active_hour% Hours of work aggragated at ... Time: %A_Hour%:%A_Min%:%A_Sec%.,1
+        ;MsgBox ,,, %aggregate_active_hour% Hours of work aggregated at ... Time: %A_Hour%:%A_Min%:%A_Sec%.,1
       }
       FileAppend, `n, C:\AHK\Aggregate_working_Hours.txt
       ;2019_12_12 new constant indication
@@ -559,6 +564,22 @@ Progress_off_timer: ; timer to turn of message
 Progress, Off
 return
 
+ResetAggregateActiveTimesMenuHandler:  ; Reset Aggregate active Times
+MsgBox You selected %A_ThisMenuItem% from menu %A_ThisMenu%.
+; put negative time in log for undo the today aggregated time. 
+  FormatTime, DateString, YYYYMMDDHH24MISS, yyyy_MM_dd__HH:mm
+  FileAppend, %DateString%, C:\AHK\Aggregate_working_Hours.txt
+  FileAppend, " agg min: ", C:\AHK\Aggregate_working_Hours.txt
+  temp_log_minus_time := 0 - aggregate_active_min
+  FileAppend, %temp_log_minus_time%, C:\AHK\Aggregate_working_Hours.txt
+  
+  ; we do not reset the play time here, since we were mistakenly in "work session"
+  aggregate_play_min := aggregate_play_min + aggregate_active_min
+  aggregate_active_min := 0
+  aggregate_active_hour := 0
+  
+return
+
 
 ; // from other macros:
 ; // ------------------
@@ -573,6 +594,7 @@ return
 ; 2019_08_04__10:40  ; start 5 minutes time counting from zero (isolate playing from working session)
 ; 2022_07_10__21_01  ; 1) adding aggregate_play_min 2) change the rollover time from midnight to 4 am
 ; 2022_12_11__18_50  ; adding Check_Wake_Up_Timer_Func
+; 2025_07_15__13_39  ; adding ResetAggregateActiveTimesMenuHandler()  
 
 ; bug notification:
 ; 2022_09_11: sometimes (rare) after hibernate wakeup the aggregate_active_X is not reset in the next day?
